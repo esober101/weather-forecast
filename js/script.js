@@ -82,6 +82,27 @@ $(document).ready(function () {
             console.log("City does not exist", cityNotFound);
         });
 
+        // Five Day Forecast
+        $.ajax({
+            url: `https://api.openweathermap.org/data/2.5/forecast?q=${chosenCity}&mode=json&APPID=${apiKey}&units=imperial`,
+            method: "GET"
+        }).done(function (response) {
+            console.log("forecast info", response);
+            var a = 1;
+            for (var i = 5; i < response.list.length; i = i + 8) {
+                $("#day-" + a).text(response.list[i].dt_txt);
+                var iconcode = response.list[i].weather[0].icon;
+                var iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+                $("#icon-" + a).attr("src", iconurl);
+                $("#temp-" + a).text("Temp: " + response.list[i].main.temp + "°F");
+                $("#humidity-" + a).text("Humidity: " + response.list[i].main.humidity + "%");
+                a++;
+            }
+            $("#cityNotFound").addClass("hide");
+            $("#fiveDayForecast").removeClass("hide");
+            $("#fiveDayCards").removeClass("hide");
+        });
+    }
 });
 function cityStorage() {
     localStorage.setItem("enteredCities", JSON.stringify(enteredCities));
