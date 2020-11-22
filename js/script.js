@@ -41,7 +41,46 @@ $(document).ready(function () {
                 $(".list-group").append(liElement);
             });
     }
-
+    // Current Weather
+    function getWeather(chosenCity) {
+        var url = `https://api.openweathermap.org/data/2.5/weather?q=${chosenCity}&APPID=${apiKey}&units=imperial`;
+        homeCity.text(chosenCity + " " + todaysDate + " ");
+        $.ajax({
+            url: url,
+            method: "GET"
+        }).done(function (response) {
+            console.log("current city response", response);
+            function renderCurrentConditions() {
+                var iconcode = response.weather[0].icon;
+                var iconurl = "http://openweathermap.org/img/w/" + iconcode + ".png";
+                icon.attr('src', iconurl);
+                homeCity.append(icon);
+                $("#city-temp").text("Temperature | " + response.main.temp + "°F");
+                $("#city-humidity").text("Humidity | " + response.main.humidity + "%");
+                $("#city-wind-speed").text("Wind Speed | " + response.wind.speed + " MPH");
+            }
+            var latitude = response.coord.lat;
+            var longitude = response.coord.lon;
+            var uvIndexUrl = `https://api.openweathermap.org/data/2.5/uvi?lat=${latitude}&;lon=${longitude}&APPID=${apiKey}`;
+            renderCurrentConditions();
+            $.ajax({
+                url: uvIndexUrl,
+                method: "GET"
+            }).done(function (response) {
+                console.log(response);
+                $("#cityNotFound").addClass("hide");
+                $("#city-uv-index").text(`UV Index | ${response.value}`);
+                $("#begin").addClass("hide");
+                $("#weather").removeClass("hide");
+            });
+        }).fail(function (cityNotFound){
+            $("#cityNotFound").removeClass("hide");
+            $("#begin").addClass("hide");
+            $("#weather").addClass("hide");
+            $("#fiveDayForecast").addClass("hide");
+            $("#fiveDayCards").addClass("hide");
+            console.log("City does not exist", cityNotFound);
+        });
 
 });
 function cityStorage() {
