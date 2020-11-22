@@ -41,6 +41,32 @@ $(document).ready(function () {
                 $(".list-group").append(liElement);
             });
     }
+
+        // City list
+        $(document).on("click", ".city-list", function (event) {
+            event.preventDefault();
+            var buttonText = $(this).text();
+            getWeather(buttonText);
+            if ($(this).hasClass("delete-icon")) {
+            buttonText = "";
+            } else {
+            getWeather(buttonText);
+            }
+        });
+    
+        // Remove cities
+        $(document).on("click", ".delete-icon", function (event) {
+            event.preventDefault();
+            var deletedCity = $(this).parent().text();
+            enteredCities = localStorage.getItem("enteredCities");
+            enteredCities = JSON.parse(enteredCities);
+            enteredCities = enteredCities.filter(city => {
+                return city != deletedCity;
+            });
+            cityStorage();
+            renderSearchHistory();
+        });
+        
     // Current Weather
     function getWeather(chosenCity) {
         var url = `https://api.openweathermap.org/data/2.5/weather?q=${chosenCity}&APPID=${apiKey}&units=imperial`;
